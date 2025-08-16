@@ -28,25 +28,36 @@ jobs:
           path: monorepo
           ref: ${{ github.event.inputs.branch || 'main' }}
           token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
           
       - name: Update documentation
         run: |
           # Copy documentation from monorepo
-          if [ -d "monorepo/docs" ]; then
-            # Clear existing docs except intro.md
-            find docs -type f -name "*.md" ! -name "intro.md" -delete || true
-            
-            # Copy new documentation
-            cp -r monorepo/docs/* docs/ || true
-            
-            # Check if there are changes
-            if [ -n "$(git status --porcelain)" ]; then
-              echo "Documentation changes detected"
-              echo "HAS_CHANGES=true" >> $GITHUB_ENV
+          if [ -d "monorepo" ]; then
+            echo "Monorepo found, checking for documentation..."
+            if [ -d "monorepo/docs" ]; then
+              echo "Documentation directory found in monorepo"
+              # Clear existing docs except intro.md
+              find docs -type f -name "*.md" ! -name "intro.md" -delete || true
+              
+              # Copy new documentation
+              cp -r monorepo/docs/* docs/ || true
+              
+              # Check if there are changes
+              if [ -n "$(git status --porcelain)" ]; then
+                echo "Documentation changes detected"
+                echo "HAS_CHANGES=true" >> $GITHUB_ENV
+              else
+                echo "No documentation changes"
+                echo "HAS_CHANGES=false" >> $GITHUB_ENV
+              fi
             else
-              echo "No documentation changes"
+              echo "No docs directory found in monorepo"
               echo "HAS_CHANGES=false" >> $GITHUB_ENV
             fi
+          else
+            echo "Monorepo not found, cannot update documentation"
+            echo "HAS_CHANGES=false" >> $GITHUB_ENV
           fi
           
       - name: Create Pull Request

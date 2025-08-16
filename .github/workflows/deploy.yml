@@ -37,6 +37,7 @@ jobs:
           repository: tafystudio/tafystudio
           path: monorepo
           token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
         
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -51,8 +52,16 @@ jobs:
         run: |
           # This script will copy documentation from the monorepo
           # Adjust paths as needed based on monorepo structure
-          if [ -d "monorepo/docs" ]; then
-            cp -r monorepo/docs/* docs/ || true
+          if [ -d "monorepo" ]; then
+            echo "Monorepo found, checking for documentation..."
+            if [ -d "monorepo/docs" ]; then
+              echo "Copying documentation from monorepo..."
+              cp -r monorepo/docs/* docs/ || true
+            else
+              echo "No docs directory found in monorepo"
+            fi
+          else
+            echo "Monorepo not found, using default documentation"
           fi
           
       - name: Build website
