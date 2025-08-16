@@ -45,6 +45,5 @@ build/
 .tmp/
 
 # Package manager files
-package-lock.json
 yarn.lock
 pnpm-lock.yaml
