@@ -27,12 +27,29 @@ jobs:
         uses: actions/checkout@v4
         
       - name: Checkout main repository
+        id: checkout-main
         uses: actions/checkout@v4
         with:
           repository: tafystudio/tafystudio
           path: tafystudio-main
-          # No token needed for public repository
-          # Remove continue-on-error to ensure we know if checkout fails
+        continue-on-error: true
+      
+      - name: Check if main repository was cloned
+        id: check-repo
+        run: |
+          if [ -d "tafystudio-main" ]; then
+            echo "Main repository cloned successfully"
+            echo "repo_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "WARNING: Main repository could not be cloned"
+            echo "This might be because:"
+            echo "1. The repository 'tafystudio/tafystudio' doesn't exist"
+            echo "2. The repository is private and needs authentication"
+            echo "3. There's a network or GitHub API issue"
+            echo ""
+            echo "Creating a demo documentation structure instead..."
+            echo "repo_exists=false" >> $GITHUB_OUTPUT
+          fi
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -67,6 +84,7 @@ jobs:
           pip install sphinx sphinx-rtd-theme sphinx-autodoc-typehints
       
       - name: Install monorepo dependencies
+        if: steps.check-repo.outputs.repo_exists == 'true'
         run: |
           cd tafystudio-main
           
@@ -103,6 +121,7 @@ jobs:
           cd ..
       
       - name: Extract documentation from monorepo
+        if: steps.check-repo.outputs.repo_exists == 'true'
         run: |
           cd tafystudio-main
           # Make the script executable (in case permissions aren't preserved)
