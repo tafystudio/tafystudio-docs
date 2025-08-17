@@ -68,7 +68,186 @@ jobs:
               cp tafystudio-main/README.md docs/
             fi
           else
-            echo "Main repository not available, using existing documentation"
+            echo "Main repository not available, creating placeholder documentation"
+            
+            # Create placeholder files for all expected documents
+            cat > docs/README.md << 'EOF'
+          ---
+          title: Tafy Studio Documentation
+          sidebar_position: 1
+          ---
+
+          # Welcome to Tafy Studio
+
+          Tafy Studio is a Robot Distributed Operation System designed to simplify robotics development.
+
+          ## Getting Started
+
+          - [Vision](./VISION) - Learn about our project vision
+          - [Quick Start](./QUICKSTART) - Get up and running quickly
+          - [Architecture](./ARCHITECTURE) - Understand the system design
+
+          ## Note
+
+          This is placeholder documentation. The full documentation will be available once the main repository is accessible.
+          EOF
+
+            cat > docs/VISION.md << 'EOF'
+          ---
+          title: Vision
+          ---
+
+          # Tafy Studio Vision
+
+          Our vision is to create a comprehensive platform for robotics development that is:
+
+          - **Accessible** - Easy to use for developers at all levels
+          - **Scalable** - From single robots to large fleets
+          - **Flexible** - Support for various hardware and use cases
+
+          *Full vision document coming soon.*
+          EOF
+
+            cat > docs/ARCHITECTURE.md << 'EOF'
+          ---
+          title: Architecture
+          ---
+
+          # System Architecture
+
+          Tafy Studio uses a distributed architecture based on:
+
+          - **NATS Messaging** - For real-time communication
+          - **HAL (Hardware Abstraction Layer)** - For hardware independence
+          - **Multi-language SDKs** - TypeScript, Python, and Go
+
+          *Detailed architecture documentation coming soon.*
+          EOF
+
+            cat > docs/CONCEPTS.md << 'EOF'
+          ---
+          title: Core Concepts
+          ---
+
+          # Core Concepts
+
+          Key concepts in Tafy Studio:
+
+          - **Nodes** - Independent processing units
+          - **Messages** - Communication between nodes
+          - **HAL** - Hardware abstraction
+
+          *Full concepts guide coming soon.*
+          EOF
+
+            cat > docs/QUICKSTART.md << 'EOF'
+          ---
+          title: Quick Start
+          ---
+
+          # Quick Start Guide
+
+          Get started with Tafy Studio in minutes.
+
+          ## Installation
+
+          ```bash
+          # Install the CLI
+          npm install -g @tafystudio/cli
+
+          # Create a new project
+          tafy create my-robot-project
+          ```
+
+          *Complete quick start guide coming soon.*
+          EOF
+
+            cat > docs/DEVELOPMENT_SETUP.md << 'EOF'
+          ---
+          title: Development Setup
+          ---
+
+          # Development Setup
+
+          Set up your development environment for Tafy Studio.
+
+          ## Prerequisites
+
+          - Node.js 18+
+          - Python 3.10+
+          - Go 1.21+
+
+          *Full development setup guide coming soon.*
+          EOF
+
+            cat > docs/TROUBLESHOOTING.md << 'EOF'
+          ---
+          title: Troubleshooting
+          ---
+
+          # Troubleshooting Guide
+
+          Common issues and solutions.
+
+          ## Connection Issues
+
+          - Check NATS server is running
+          - Verify network configuration
+
+          *Complete troubleshooting guide coming soon.*
+          EOF
+
+            cat > docs/TESTING.md << 'EOF'
+          ---
+          title: Testing
+          ---
+
+          # Testing Guide
+
+          Best practices for testing Tafy Studio applications.
+
+          ## Unit Testing
+
+          - Test individual components
+          - Mock NATS connections
+
+          *Full testing guide coming soon.*
+          EOF
+
+            cat > docs/SECURITY.md << 'EOF'
+          ---
+          title: Security
+          ---
+
+          # Security Guidelines
+
+          Security best practices for Tafy Studio.
+
+          ## Authentication
+
+          - Use TLS for NATS connections
+          - Implement proper access controls
+
+          *Complete security guide coming soon.*
+          EOF
+
+            cat > docs/HAL_SPEC.md << 'EOF'
+          ---
+          title: HAL Specification
+          ---
+
+          # Hardware Abstraction Layer (HAL) Specification
+
+          The HAL provides a standardized interface for hardware components.
+
+          ## Message Types
+
+          - Sensor data
+          - Actuator commands
+          - Status updates
+
+          *Full HAL specification coming soon.*
+          EOF
           fi
           
           # Create API documentation directory
