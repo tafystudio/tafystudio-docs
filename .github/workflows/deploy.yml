@@ -49,6 +49,17 @@ jobs:
         uses: pnpm/action-setup@v2
         with:
           version: 9
+          
+      - name: Install required tools
+        run: |
+          # Install TypeDoc globally for API documentation
+          npm install -g typedoc
+          # Show installed versions
+          echo "Node version: $(node --version)"
+          echo "npm version: $(npm --version)"
+          echo "pnpm version: $(pnpm --version)"
+          echo "Python version: $(python --version)"
+          echo "pip version: $(pip --version)"
       
       - name: Install dependencies
         run: |
@@ -58,16 +69,37 @@ jobs:
       - name: Install monorepo dependencies
         run: |
           cd tafystudio-main
+          
+          # Show what's in the monorepo root
+          echo "Monorepo structure:"
+          ls -la
+          
+          # Check for docs directory
+          echo "Checking docs directory:"
+          ls -la docs/ || echo "docs/ directory not found"
+          
           # Install uv for Python dependency management
           pip install uv
+          
           # Install Node dependencies if package.json exists
           if [ -f "package.json" ]; then
-            npm install || echo "npm install failed, continuing..."
+            echo "Installing npm dependencies..."
+            npm install || echo "WARNING: npm install failed"
           fi
+          
           # Install pnpm dependencies for packages if needed
           if [ -f "pnpm-workspace.yaml" ]; then
-            pnpm install || echo "pnpm install failed, continuing..."
+            echo "Installing pnpm workspace dependencies..."
+            pnpm install --no-frozen-lockfile || echo "WARNING: pnpm install failed"
           fi
+          
+          # Check if required directories exist
+          echo "Checking for required directories:"
+          [ -d "packages" ] && echo "✓ packages/ exists" || echo "✗ packages/ not found"
+          [ -d "apps" ] && echo "✓ apps/ exists" || echo "✗ apps/ not found"
+          [ -d "scripts" ] && echo "✓ scripts/ exists" || echo "✗ scripts/ not found"
+          [ -f "Makefile" ] && echo "✓ Makefile exists" || echo "✗ Makefile not found"
+          
           cd ..
       
       - name: Extract documentation from monorepo
@@ -76,15 +108,32 @@ jobs:
           # Make the script executable (in case permissions aren't preserved)
           chmod +x scripts/extract-docs.sh
           
-          # Run extraction and capture any errors
-          if ! ./scripts/extract-docs.sh ../extracted-docs; then
+          # Check if the script exists first
+          if [ ! -f "scripts/extract-docs.sh" ]; then
+            echo "ERROR: scripts/extract-docs.sh not found in monorepo"
+            echo "Available files in scripts/:"
+            ls -la scripts/ || echo "scripts/ directory not found"
+            exit 1
+          fi
+          
+          # Check if make is available
+          if ! command -v make &> /dev/null; then
+            echo "ERROR: 'make' command not found"
+            exit 1
+          fi
+          
+          # Run extraction with detailed output
+          echo "Running extract-docs.sh..."
+          if ! bash -x ./scripts/extract-docs.sh ../extracted-docs 2>&1; then
             echo "ERROR: Documentation extraction failed"
             echo "Checking monorepo structure:"
             ls -la
             echo "Checking if Makefile exists:"
-            ls -la Makefile
+            ls -la Makefile || echo "Makefile not found"
             echo "Checking available make targets:"
-            grep -E "^[a-zA-Z0-9_-]+:" Makefile | head -20
+            grep -E "^[a-zA-Z0-9_-]+:" Makefile | head -20 || echo "Could not read Makefile"
+            echo "Checking .docs-build directory if it exists:"
+            ls -la .docs-build/ || echo ".docs-build directory not found"
             exit 1
           fi
           
@@ -101,6 +150,50 @@ jobs:
           find extracted-docs -type f -name "*.json" -exec echo {} \; -exec head -5 {} \;
           echo "All extracted files:"
           find extracted-docs -type f | head -20
+          
+          # Check if content directory exists
+          if [ ! -d "extracted-docs/content" ]; then
+            echo "WARNING: extracted-docs/content not found"
+            echo "Creating minimal content structure..."
+            mkdir -p extracted-docs/content
+            
+            # Create a minimal README
+            cat > extracted-docs/content/README.md << 'EOF'
+---
+title: Tafy Studio Documentation
+sidebar_position: 1
+---
+
+# Tafy Studio Documentation
+
+Welcome to the Tafy Studio documentation.
+
+**Note**: The documentation extraction from the monorepo failed. This is placeholder content.
+
+## Troubleshooting
+
+If you're seeing this message, it means the documentation build process couldn't extract content from the main repository. Please check:
+
+1. The monorepo has a `docs/` directory with markdown files
+2. The `scripts/extract-docs.sh` script exists and is executable
+3. The `make docs-prepare` target works correctly
+
+For more information, check the GitHub Actions logs.
+EOF
+            
+            # Create other required files
+            for file in VISION.md ARCHITECTURE.md CONCEPTS.md QUICKSTART.md DEVELOPMENT_SETUP.md TROUBLESHOOTING.md TESTING.md SECURITY.md HAL_SPEC.md; do
+              cat > "extracted-docs/content/$file" << EOF
+---
+title: ${file%.md}
+---
+
+# ${file%.md}
+
+This documentation file is not yet available.
+EOF
+            done
+          fi
       
       - name: Process extracted documentation
         run: |
@@ -165,6 +258,12 @@ jobs:
             echo "Generated sidebars.ts from extracted documentation"
           else
             echo "Warning: No index.json found, using existing sidebars.ts"
+            # Verify sidebars.ts exists
+            if [ ! -f "sidebars.ts" ]; then
+              echo "ERROR: No sidebars.ts found and couldn't generate one"
+              echo "Using fallback sidebar configuration"
+              cp sidebars.ts.backup sidebars.ts || echo "No backup found either"
+            fi
           fi
           
           # Create API documentation pages that reference the static API docs
