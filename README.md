@@ -1,88 +1,128 @@
-# tafystudio-docs
+# Tafy Studio Documentation Site
 
-Documentation website for [Tafy Studio](https://github.com/tafystudio/tafystudio) built with [Docusaurus](https://docusaurus.io/).
+This repository contains the Docusaurus configuration for the Tafy Studio documentation website deployed at <https://docs.tafy.studio>.
 
-## Overview
+## Architecture
 
-This repository contains the documentation for the Tafy Studio monorepo project. The documentation is:
-- Built using Docusaurus
-- Hosted at [docs.tafy.studio](https://docs.tafy.studio)
-- Automatically deployed via GitHub Actions when documentation changes in the main monorepo
+- Documentation source files are maintained in the main [tafystudio/tafystudio](https://github.com/tafystudio/tafystudio) repository
+- This repository contains only the Docusaurus configuration and build process
+- GitHub Actions automatically fetches the latest docs and builds the site
+- Deployment happens via GitHub Pages
 
-The main website is hosted at [tafy.studio](https://tafy.studio) from the [tafystudio.github.io](https://github.com/tafystudio/tafystudio.github.io) repository.
+## Setup Status
 
-## Setup Checklist
+### ✅ Completed
+- [x] Docusaurus configuration with TypeScript support
+- [x] GitHub Actions workflow for automated deployment
+- [x] Scheduled builds every 6 hours
+- [x] Custom domain support (CNAME file)
+- [x] API documentation structure
+- [x] Sidebar configuration matching expected documentation
 
-### 🔧 Initial Repository Setup
+### 🔑 Required: Repository Secret
 
-- [ ] **Create `.gitignore` file** for Node.js/Docusaurus project
-- [ ] **Initialize npm project** with `package.json`
-- [ ] **Install Docusaurus** and create initial site structure
-- [ ] **Configure Docusaurus** settings (site title, URL, baseUrl, etc.)
-- [ ] **Create initial documentation structure** (folders, sidebar config)
+⚠️ **Important**: You must add a repository secret for the workflow to access the main repository:
+
+1. Go to: <https://github.com/tafystudio/tafystudio-docs/settings/secrets/actions>
+2. Click "New repository secret"
+3. Add secret:
+   - **Name**: `DOCS_ACCESS_TOKEN`
+   - **Value**: A GitHub Personal Access Token with appropriate permissions
+
+#### Creating the Personal Access Token
+
+1. Go to: <https://github.com/settings/tokens>
+2. Click "Generate new token" → "Generate new token (classic)"
+3. Configure:
+   - **Note**: `Tafy Studio Docs Builder`
+   - **Expiration**: 90 days or longer
+   - **Required Scopes**:
+     - ✅ `repo` (if main repo is private)
+     - ✅ `public_repo` (if main repo is public)
+4. Generate and copy the token immediately
 
 ### 🌐 GitHub Pages Configuration
 
-- [ ] **Enable GitHub Pages** in repository settings
-- [ ] **Configure custom domain** `docs.tafy.studio`
-  - [ ] Add CNAME file to the repository
-  - [ ] Configure DNS records (CNAME pointing to `tafystudio.github.io`)
-  - [ ] Enable HTTPS in GitHub Pages settings
+After pushing this repository:
 
-### 🤖 GitHub Actions Workflow
+1. Go to: Settings → Pages
+2. Under "Build and deployment":
+   - Source: **GitHub Actions** (should be automatically selected)
+3. Custom domain will be configured automatically via the CNAME file
 
-- [ ] **Create deployment workflow** (`.github/workflows/deploy.yml`)
-  - [ ] Checkout this repository
-  - [ ] Checkout monorepo to access latest documentation
-  - [ ] Build Docusaurus site
-  - [ ] Deploy to GitHub Pages
-- [ ] **Configure repository secrets** for GitHub Actions
-- [ ] **Set up workflow triggers**
-  - [ ] Manual dispatch
-  - [ ] Webhook from monorepo on documentation changes
+### 🔗 DNS Configuration
 
-### 📝 Documentation Content
+Add a CNAME record in your DNS provider:
+- **Type**: `CNAME`
+- **Name**: `docs`
+- **Value**: `tafystudio.github.io`
+- **TTL**: Auto or 3600
 
-- [ ] **Define documentation structure** (API docs, guides, tutorials, etc.)
-- [ ] **Create documentation templates**
-- [ ] **Set up auto-generation scripts** for API documentation from monorepo
-- [ ] **Configure search** (Algolia DocSearch or local search)
-
-### 🔗 Integration
-
-- [ ] **Link from main website** (tafy.studio) to documentation
-- [ ] **Add documentation badge** to monorepo README
-- [ ] **Configure cross-repository automation**
-- [ ] **Set up documentation versioning** strategy
-
-### 🧪 Testing & Quality
-
-- [ ] **Add build tests** to GitHub Actions
-- [ ] **Configure broken link checker**
-- [ ] **Set up preview deployments** for PRs
-- [ ] **Create contribution guidelines** for documentation
-
-## Getting Started
+## Local Development
 
 ```bash
-# Clone the repository
-git clone https://github.com/tafystudio/tafystudio-docs.git
-cd tafystudio-docs
-
-# Install dependencies (after package.json is created)
+# Install dependencies
 npm install
 
 # Start development server
-npm run start
+npm start
 
-# Build for production
+# Build production site
 npm run build
+
+# Serve production build locally
+npm run serve
 ```
+
+## How It Works
+
+The GitHub Actions workflow:
+1. Runs on push to main, manual trigger, or every 6 hours
+2. Checks out this repository
+3. Attempts to checkout the main `tafystudio/tafystudio` repository
+4. Copies documentation from the main repo (if available)
+5. Generates API documentation structure
+6. Builds the Docusaurus site
+7. Deploys to GitHub Pages
+
+## Documentation Structure
+
+The workflow expects these documentation files in the main repository:
+- `README.md` - Main documentation homepage
+- `docs/VISION.md` - Project vision
+- `docs/ARCHITECTURE.md` - Architecture overview
+- `docs/CONCEPTS.md` - Core concepts
+- `docs/QUICKSTART.md` - Quick start guide
+- `docs/DEVELOPMENT_SETUP.md` - Development setup
+- `docs/TROUBLESHOOTING.md` - Troubleshooting guide
+- `docs/TESTING.md` - Testing documentation
+- `docs/SECURITY.md` - Security guidelines
+- `docs/HAL_SPEC.md` - HAL specification
+
+## Deployment
+
+The site automatically deploys when:
+- Changes are pushed to the `main` branch
+- Every 6 hours (to catch updates from the main repository)
+- Manually triggered via GitHub Actions
 
 ## Contributing
 
-Please refer to our [contributing guidelines](CONTRIBUTING.md) for information on how to contribute to the documentation.
+- **Documentation content**: Should be contributed to the main [tafystudio/tafystudio](https://github.com/tafystudio/tafystudio) repository
+- **Site configuration**: Can be updated in this repository
 
-## License
+## Troubleshooting
 
-This project is licensed under the terms specified in the [LICENSE](LICENSE) file.
+### Build Failures
+
+If the GitHub Actions workflow fails:
+1. Check if `DOCS_ACCESS_TOKEN` secret is configured
+2. Verify the token has not expired
+3. Check the Actions logs for specific errors
+
+### Missing Documentation
+
+If documentation appears missing:
+1. The workflow will use placeholder content if the main repo is not accessible
+2. Check that the expected documentation files exist in the main repository
+3. Verify the `DOCS_ACCESS_TOKEN` has appropriate permissions

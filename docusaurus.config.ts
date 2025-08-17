@@ -1,24 +1,27 @@
-import {themes as prismThemes} from 'prism-react-renderer';
-import type {Config} from '@docusaurus/types';
-import type * as Preset from '@docusaurus/preset-classic';
+// @ts-check
+// `@type` JSDoc annotations allow editor autocompletion and type checking
+// (when paired with `@ts-check`).
+// There are various equivalent ways to declare your Docusaurus config.
+// See: https://docusaurus.io/docs/api/docusaurus-config
 
-const config: Config = {
+import {themes as prismThemes} from 'prism-react-renderer';
+
+/** @type {import('@docusaurus/types').Config} */
+const config = {
   title: 'Tafy Studio Documentation',
-  tagline: 'Complete documentation for the Tafy Studio platform',
+  tagline: 'Robot Distributed Operation System',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
   url: 'https://docs.tafy.studio',
   // Set the /<baseUrl>/ pathname under which your site is served
-  // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/',
 
   // GitHub pages deployment config.
-  // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'tafystudio', // Usually your GitHub org/user name.
-  projectName: 'tafystudio-docs', // Usually your repo name.
+  organizationName: 'tafystudio',
+  projectName: 'tafystudio-docs',
 
-  onBrokenLinks: 'warn',
+  onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
 
   // Even if you don't use internationalization, you can use this field to set
@@ -32,100 +35,108 @@ const config: Config = {
   presets: [
     [
       'classic',
-      {
+      /** @type {import('@docusaurus/preset-classic').Options} */
+      ({
         docs: {
           sidebarPath: './sidebars.ts',
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
+          routeBasePath: '/', // Serve docs at the root
+          // Remove this to remove the "Edit this page" links.
           editUrl:
-            'https://github.com/tafystudio/tafystudio-docs/tree/main/',
+            'https://github.com/tafystudio/tafystudio/tree/main/docs/',
         },
-        blog: false, // Disable blog feature
+        blog: false, // Disable blog
         theme: {
           customCss: './src/css/custom.css',
         },
-      } satisfies Preset.Options,
+      }),
     ],
   ],
 
-  themeConfig: {
-    // Replace with your project's social card
-    image: 'img/docusaurus-social-card.jpg',
-    navbar: {
-      title: 'Tafy Studio',
-      logo: {
-        alt: 'Tafy Studio Logo',
-        src: 'img/logo.svg',
+  themeConfig:
+    /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
+    ({
+      // Replace with your project's social card
+      image: 'img/docusaurus-social-card.jpg',
+      navbar: {
+        title: 'Tafy Studio',
+        logo: {
+          alt: 'Tafy Studio Logo',
+          src: 'img/logo.svg',
+        },
+        items: [
+          {
+            type: 'docSidebar',
+            sidebarId: 'tutorialSidebar',
+            position: 'left',
+            label: 'Documentation',
+          },
+          {
+            href: 'https://github.com/tafystudio/tafystudio',
+            label: 'GitHub',
+            position: 'right',
+          },
+          {
+            href: 'https://tafy.studio',
+            label: 'Main Site',
+            position: 'right',
+          },
+        ],
       },
-      items: [
-        {
-          type: 'docSidebar',
-          sidebarId: 'tutorialSidebar',
-          position: 'left',
-          label: 'Documentation',
-        },
-        {
-          href: 'https://tafy.studio',
-          label: 'Main Site',
-          position: 'right',
-        },
-        {
-          href: 'https://github.com/tafystudio/tafystudio',
-          label: 'GitHub',
-          position: 'right',
-        },
-      ],
-    },
-    footer: {
-      style: 'dark',
-      links: [
-        {
-          title: 'Docs',
-          items: [
-            {
-              label: 'Getting Started',
-              to: '/docs/intro',
-            },
-            {
-              label: 'API Reference',
-              to: '/docs/intro',
-            },
-          ],
-        },
-        {
-          title: 'Community',
-          items: [
-            {
-              label: 'Discord',
-              href: 'https://discord.gg/tafystudio',
-            },
-            {
-              label: 'Twitter',
-              href: 'https://twitter.com/tafystudio',
-            },
-          ],
-        },
-        {
-          title: 'More',
-          items: [
-            {
-              label: 'Main Website',
-              href: 'https://tafy.studio',
-            },
-            {
-              label: 'GitHub',
-              href: 'https://github.com/tafystudio/tafystudio',
-            },
-          ],
-        },
-      ],
-      copyright: `Copyright © ${new Date().getFullYear()} Tafy Studio. Built with Docusaurus.`,
-    },
-    prism: {
-      theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
-    },
-  } satisfies Preset.ThemeConfig,
+      footer: {
+        style: 'dark',
+        links: [
+          {
+            title: 'Docs',
+            items: [
+              {
+                label: 'Getting Started',
+                to: '/',
+              },
+              {
+                label: 'Architecture',
+                to: '/ARCHITECTURE',
+              },
+              {
+                label: 'API Reference',
+                to: '/api',
+              },
+            ],
+          },
+          {
+            title: 'Community',
+            items: [
+              {
+                label: 'GitHub',
+                href: 'https://github.com/tafystudio/tafystudio',
+              },
+              {
+                label: 'Discussions',
+                href: 'https://github.com/tafystudio/tafystudio/discussions',
+              },
+            ],
+          },
+          {
+            title: 'More',
+            items: [
+              {
+                label: 'Main Website',
+                href: 'https://tafy.studio',
+              },
+              {
+                label: 'Security',
+                href: 'https://github.com/tafystudio/tafystudio/security',
+              },
+            ],
+          },
+        ],
+        copyright: `Copyright © ${new Date().getFullYear()} Tafy Studio. Built with Docusaurus.`,
+      },
+      prism: {
+        theme: prismThemes.github,
+        darkTheme: prismThemes.dracula,
+        additionalLanguages: ['bash', 'diff', 'json', 'docker', 'yaml', 'python', 'go'],
+      },
+    }),
 };
 
 export default config;
