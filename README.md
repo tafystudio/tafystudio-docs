@@ -66,10 +66,11 @@ The GitHub Actions workflow:
    - **Triggered from the monorepo** when docs are updated
 2. Checks out this repository
 3. Checks out the main `tafystudio/tafystudio` repository (public, no auth needed)
-4. Copies documentation from the main repo (if available)
-5. Generates API documentation structure
-6. Builds the Docusaurus site
-7. Deploys to GitHub Pages
+4. **Runs the monorepo's `extract-docs.sh` script** to extract and prepare documentation
+5. Processes the extracted documentation into the appropriate directories
+6. Generates dynamic sidebars based on available content
+7. Builds the Docusaurus site
+8. Deploys to GitHub Pages
 
 ### Automatic Updates from Monorepo
 
@@ -107,17 +108,17 @@ This workflow will automatically trigger a documentation rebuild whenever:
 
 ## Documentation Structure
 
-The workflow expects these documentation files in the main repository:
-- `README.md` - Main documentation homepage
-- `docs/VISION.md` - Project vision
-- `docs/ARCHITECTURE.md` - Architecture overview
-- `docs/CONCEPTS.md` - Core concepts
-- `docs/QUICKSTART.md` - Quick start guide
-- `docs/DEVELOPMENT_SETUP.md` - Development setup
-- `docs/TROUBLESHOOTING.md` - Troubleshooting guide
-- `docs/TESTING.md` - Testing documentation
-- `docs/SECURITY.md` - Security guidelines
-- `docs/HAL_SPEC.md` - HAL specification
+The monorepo uses a sophisticated documentation extraction process defined in `docs/DOCUMENTATION_BUILD_SPEC.md`. The process:
+
+1. **Static Documentation** - Markdown files in `/docs/` directory
+2. **API Documentation** - Generated from source code using TypeDoc, Sphinx, and godoc
+3. **Dynamic Content** - HAL schemas, examples, and package/app READMEs
+
+The extraction process is handled by the monorepo's `scripts/extract-docs.sh` script which:
+- Runs `make docs-prepare` to build all documentation
+- Extracts static content, API docs, schemas, and examples
+- Creates an `index.json` manifest for the docs site
+- Packages everything for Docusaurus consumption
 
 ## Deployment
 
@@ -143,9 +144,10 @@ If the GitHub Actions workflow fails:
 ### Missing Documentation
 
 If documentation appears missing:
-1. The workflow will generate placeholder content if the main repo is not accessible
-2. Check that the expected documentation files exist in the main repository
-3. Manually trigger a rebuild using the "Run workflow" button in Actions
+1. Check that the monorepo has the required documentation structure
+2. Verify the `extract-docs.sh` script exists and is executable
+3. Check the monorepo's Makefile has the `docs-prepare` target
+4. Manually trigger a rebuild using the "Run workflow" button in Actions
 
 ### Automatic Updates Not Working
 
