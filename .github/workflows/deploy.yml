@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # Trigger from monorepo when docs update
+  repository_dispatch:
+    types: [docs-update]
   schedule:
     # Run every 6 hours to catch updates from main repo
     - cron: '0 */6 * * *'
@@ -29,7 +32,7 @@ jobs:
         with:
           repository: tafystudio/tafystudio
           path: tafystudio-main
-          token: ${{ secrets.DOCS_ACCESS_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
       
       - name: Setup Node.js

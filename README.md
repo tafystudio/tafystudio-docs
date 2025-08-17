@@ -19,27 +19,9 @@ This repository contains the Docusaurus configuration for the Tafy Studio docume
 - [x] API documentation structure
 - [x] Sidebar configuration matching expected documentation
 
-### 🔑 Required: Repository Secret
+### 🚀 No Repository Secrets Required!
 
-⚠️ **Important**: You must add a repository secret for the workflow to access the main repository:
-
-1. Go to: <https://github.com/tafystudio/tafystudio-docs/settings/secrets/actions>
-2. Click "New repository secret"
-3. Add secret:
-   - **Name**: `DOCS_ACCESS_TOKEN`
-   - **Value**: A GitHub Personal Access Token with appropriate permissions
-
-#### Creating the Personal Access Token
-
-1. Go to: <https://github.com/settings/tokens>
-2. Click "Generate new token" → "Generate new token (classic)"
-3. Configure:
-   - **Note**: `Tafy Studio Docs Builder`
-   - **Expiration**: 90 days or longer
-   - **Required Scopes**:
-     - ✅ `repo` (if main repo is private)
-     - ✅ `public_repo` (if main repo is public)
-4. Generate and copy the token immediately
+Since the main repository is public, no personal access token is needed. The workflow uses the default `GITHUB_TOKEN` to checkout the monorepo.
 
 ### 🌐 GitHub Pages Configuration
 
@@ -77,13 +59,51 @@ npm run serve
 ## How It Works
 
 The GitHub Actions workflow:
-1. Runs on push to main, manual trigger, or every 6 hours
+1. Runs when:
+   - Changes are pushed to main branch
+   - Manual trigger via GitHub UI
+   - Every 6 hours (scheduled)
+   - **Triggered from the monorepo** when docs are updated
 2. Checks out this repository
-3. Attempts to checkout the main `tafystudio/tafystudio` repository
+3. Checks out the main `tafystudio/tafystudio` repository (public, no auth needed)
 4. Copies documentation from the main repo (if available)
 5. Generates API documentation structure
 6. Builds the Docusaurus site
 7. Deploys to GitHub Pages
+
+### Automatic Updates from Monorepo
+
+To enable automatic documentation updates when the monorepo changes, add this workflow to the main repository at `.github/workflows/trigger-docs-build.yml`:
+
+```yaml
+name: Trigger Documentation Build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'README.md'
+      - '.github/workflows/trigger-docs-build.yml'
+  workflow_dispatch:
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger docs repository build
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: tafystudio/tafystudio-docs
+          event-type: docs-update
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
+```
+
+This workflow will automatically trigger a documentation rebuild whenever:
+- Documentation files in the `docs/` directory are updated
+- The main `README.md` is changed
+- The workflow itself is modified
 
 ## Documentation Structure
 
@@ -116,13 +136,20 @@ The site automatically deploys when:
 ### Build Failures
 
 If the GitHub Actions workflow fails:
-1. Check if `DOCS_ACCESS_TOKEN` secret is configured
-2. Verify the token has not expired
-3. Check the Actions logs for specific errors
+1. Check the Actions logs for specific errors
+2. Verify the main repository is accessible (public)
+3. Ensure npm dependencies install correctly
 
 ### Missing Documentation
 
 If documentation appears missing:
-1. The workflow will use placeholder content if the main repo is not accessible
+1. The workflow will generate placeholder content if the main repo is not accessible
 2. Check that the expected documentation files exist in the main repository
-3. Verify the `DOCS_ACCESS_TOKEN` has appropriate permissions
+3. Manually trigger a rebuild using the "Run workflow" button in Actions
+
+### Automatic Updates Not Working
+
+If the monorepo updates aren't triggering rebuilds:
+1. Verify the trigger workflow is added to the monorepo
+2. Check that the workflow has the correct repository name
+3. Look for `repository_dispatch` events in the Actions tab
