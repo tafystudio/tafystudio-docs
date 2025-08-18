@@ -139,13 +139,13 @@ pnpm run dev
 
 ### Cannot Access Hub UI
 
-**Problem**: Cannot access <http://localhost:3000>
+**Problem**: Cannot access [http://localhost:3000](http://localhost:3000)
 
 **Solution**:
 
 1. Check if port is in use: `lsof -i :3000`
 2. Verify the dev server is running: `cd apps/hub-ui && pnpm run dev`
-3. Try accessing <http://127.0.0.1:3000> instead
+3. Try accessing [http://127.0.0.1:3000](http://127.0.0.1:3000) instead
 
 ### k3s Services Unreachable
 

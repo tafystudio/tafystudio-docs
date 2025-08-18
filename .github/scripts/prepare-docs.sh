@@ -17,6 +17,11 @@ if [ -d "$INPUT_DIR/content" ]; then
     cp -r "$INPUT_DIR/content/"* docs/ 2>/dev/null || true
 fi
 
+# Rename README.md to index.md for Docusaurus
+if [ -f "docs/README.md" ]; then
+    mv docs/README.md docs/index.md
+fi
+
 # Copy static assets
 if [ -d "$INPUT_DIR/api" ]; then
     cp -r "$INPUT_DIR/api/"* static/api/ 2>/dev/null || true
@@ -41,5 +46,11 @@ title: API Reference
 - [Python API](/api/python/html/)
 - [Go API](https://pkg.go.dev/github.com/tafystudio/tafystudio)
 EOF
+
+# Fix MDX content issues
+if [ -f ".github/scripts/fix-mdx-content.sh" ]; then
+    echo "Fixing MDX content issues..."
+    .github/scripts/fix-mdx-content.sh docs
+fi
 
 echo "Documentation preparation complete"

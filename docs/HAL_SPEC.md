@@ -254,9 +254,9 @@ Standard error codes:
 
 ### Latency Classes
 
-- **Real-time**: <1ms (encoder feedback)
-- **Low-latency**: <10ms (motor commands)
-- **Interactive**: <100ms (camera frames)
+- **Real-time**: &lt;1ms (encoder feedback)
+- **Low-latency**: &lt;10ms (motor commands)
+- **Interactive**: &lt;100ms (camera frames)
 - **Background**: >100ms (firmware updates)
 
 ### Message Priority
@@ -312,9 +312,9 @@ Driver publishes to both, gradually deprecate v1
 ### Performance Guidelines
 
 - State updates: 10-100Hz depending on dynamics
-- Command latency: <10ms processing time
-- Startup time: <1s from power to capability announcement
-- Memory usage: <10MB for simple drivers
+- Command latency: &lt;10ms processing time
+- Startup time: &lt;1s from power to capability announcement
+- Memory usage: &lt;10MB for simple drivers
 
 ## Example: Building a Motor Driver
 

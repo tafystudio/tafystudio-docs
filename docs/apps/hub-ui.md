@@ -32,7 +32,7 @@ The Hub UI delivers:
 
 - Node.js 20 or higher
 - pnpm package manager
-- Hub API running (default: <http://localhost:8000>)
+- Hub API running (default: [http://localhost:8000](http://localhost:8000))
 
 ### Installation
 

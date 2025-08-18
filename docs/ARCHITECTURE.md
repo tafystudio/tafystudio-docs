@@ -242,9 +242,9 @@ Download to agent → Flash device → Verify → Report success
 
 ### Latency
 
-- Local message passing: <5ms
-- Command/response: <20ms
-- Video streaming: <100ms
+- Local message passing: &lt;5ms
+- Command/response: &lt;20ms
+- Video streaming: &lt;100ms
 - Suitable for soft real-time control
 
 ### Scalability
@@ -255,9 +255,9 @@ Download to agent → Flash device → Verify → Report success
 
 ### Resource Usage
 
-- Hub services: <500MB RAM
-- Node agent: <50MB RAM
-- NATS: <100MB RAM
+- Hub services: &lt;500MB RAM
+- Node agent: &lt;50MB RAM
+- NATS: &lt;100MB RAM
 - Leaves headroom for user workloads
 
 ## Future Architecture Evolution

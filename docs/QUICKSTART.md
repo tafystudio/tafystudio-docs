@@ -62,8 +62,8 @@ tafy hub start
 
 This starts:
 
-- The web UI at <http://localhost:3000>
-- Node-RED at <http://localhost:1880>
+- The web UI at [http://localhost:3000](http://localhost:3000)
+- Node-RED at [http://localhost:1880](http://localhost:1880)
 - NATS messaging at localhost:4222
 
 ### Step 4: Connect Your Robot
