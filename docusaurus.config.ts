@@ -38,11 +38,9 @@ const config = {
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
-          sidebarPath: './sidebars.ts',
+          sidebarPath: './sidebars.js',
           routeBasePath: '/', // Serve docs at the root
-          // Remove this to remove the "Edit this page" links.
-          editUrl:
-            'https://github.com/tafystudio/tafystudio/tree/main/docs/',
+          editUrl: 'https://github.com/tafystudio/tafystudio/tree/main/docs/',
         },
         blog: false, // Disable blog
         theme: {
