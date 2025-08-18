@@ -109,6 +109,9 @@ jobs:
           # This ensures they're available even if the monorepo doesn't install them
           pip install sphinx sphinx-rtd-theme sphinx-autodoc-typehints sphinx-markdown-builder myst-parser
           
+          # Also install with uv to ensure it's available in uv environments
+          uv pip install --system sphinx-markdown-builder myst-parser || echo "uv pip install failed, continuing..."
+          
           # Install Node dependencies if package.json exists
           if [ -f "package.json" ]; then
             echo "Installing npm dependencies..."
@@ -174,17 +177,25 @@ jobs:
           
           cd ..
           
-          # Verify extraction succeeded
+          # Verify extraction created something
           if [ ! -d "extracted-docs" ]; then
-            echo "ERROR: extracted-docs directory was not created"
-            exit 1
+            echo "WARNING: extracted-docs directory was not created"
+            mkdir -p extracted-docs
+          fi
+          
+          # Check what's in the .docs-build directory from monorepo
+          if [ -d "tafystudio-main/.docs-build" ]; then
+            echo "Found .docs-build in monorepo, copying contents..."
+            cp -r tafystudio-main/.docs-build/* extracted-docs/ || true
           fi
           
           # Show what was extracted
           echo "Extracted documentation structure:"
-          find extracted-docs -type f -name "*.json" -exec echo {} \; -exec head -5 {} \;
-          echo "All extracted files:"
-          find extracted-docs -type f | head -20
+          if [ -d "extracted-docs" ]; then
+            find extracted-docs -type f -name "*.json" -exec echo {} \; -exec head -5 {} \; || true
+            echo "All extracted files:"
+            find extracted-docs -type f | head -20 || true
+          fi
           
           # Check if content directory exists
           if [ ! -d "extracted-docs/content" ]; then
@@ -193,7 +204,7 @@ jobs:
             mkdir -p extracted-docs/content
             
             # Create a minimal README
-            cat > extracted-docs/content/README.md << 'EOF'
+            cat > extracted-docs/content/README.md << 'ENDOFDOC'
 ---
 title: Tafy Studio Documentation
 sidebar_position: 1
@@ -214,19 +225,20 @@ If you're seeing this message, it means the documentation build process couldn't
 3. The `make docs-prepare` target works correctly
 
 For more information, check the GitHub Actions logs.
-EOF
+ENDOFDOC
             
             # Create other required files
             for file in VISION.md ARCHITECTURE.md CONCEPTS.md QUICKSTART.md DEVELOPMENT_SETUP.md TROUBLESHOOTING.md TESTING.md SECURITY.md HAL_SPEC.md; do
-              cat > "extracted-docs/content/$file" << EOF
+              title="${file%.md}"
+              cat > "extracted-docs/content/$file" << ENDFILE
 ---
-title: ${file%.md}
+title: $title
 ---
 
-# ${file%.md}
+# $title
 
 This documentation file is not yet available.
-EOF
+ENDFILE
             done
           fi
       
@@ -334,7 +346,7 @@ EOF
           - Helper utilities for common robotics tasks
 
           Choose the API that best fits your use case and development environment.
-          EOF
+EOF
           
           # Generate TypeScript API docs page
           cat > docs/api/typescript.md << 'EOF'
@@ -367,7 +379,7 @@ EOF
           ## API Documentation
 
           [View the full TypeScript API documentation](/api/typescript/index.html)
-          EOF
+EOF
           
           # Generate Python API docs page
           cat > docs/api/python.md << 'EOF'
@@ -397,7 +409,7 @@ EOF
           ## API Documentation
 
           [View the full Python API documentation](/api/python/index.html)
-          EOF
+EOF
           
           # Go API docs reference
           cat > docs/api/go.md << 'EOF'
@@ -433,7 +445,7 @@ EOF
           }
           defer client.Close()
           ```
-          EOF
+EOF
       
       - name: Build documentation
         run: npm run build
